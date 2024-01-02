@@ -1,1 +1,1 @@
-# workflow-cleaner
+# Workflow Cleaner
