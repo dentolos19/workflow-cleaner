@@ -1,18 +1,44 @@
+from os import path
+
 import requests
-from colorama import Fore  # pip install colorama
-from github import Github  # pip install PyGithub
+from colorama import Fore
+from github import Github
 
-ACCESS_TOKEN = "<ACCESS_TOKEN>"
+ACCESS_TOKEN_FILE = ".access_token"
 
-client = Github(ACCESS_TOKEN)
+################################################################################
 
-user = client.get_user()
+access_token = ""
 
+if path.exists(ACCESS_TOKEN_FILE):
+    with open(ACCESS_TOKEN_FILE, "r") as file:
+        access_token = file.read()
+
+print("Workflow Cleaner")
+print()
+if access_token:
+    print("Your access token is already saved.")
+    print()
+    print("If you want to change your access token, delete ")
+    print(f"the file {ACCESS_TOKEN_FILE} and run this program again.")
+    print()
+    input("Press [Enter] to continue...")
+else:
+    print("Make sure your access token has access to all the")
+    print("repositories with read-write access to actions.")
+    print()
+    access_token = input("Access Token: ")
+    with open(ACCESS_TOKEN_FILE, "w") as file:
+        file.write(access_token)
+
+################################################################################
+
+print()
 print("Looking into your repositories...")
 print()
 
+user = Github(access_token).get_user()
 repos = user.get_repos()
-
 target_runs = []
 
 for repo in repos:
@@ -20,7 +46,7 @@ for repo in repos:
         continue  # ignores repositories that is not owned by the user
     workflows = repo.get_workflows()
     runs = repo.get_workflow_runs()
-    if (not workflows.totalCount > 0) and (not runs.totalCount > 0):
+    if (not workflows.totalCount > 0) or (not runs.totalCount > 0):
         continue  # ignores repositories that has no workflows or workflow runs
     print(repo.name)
     if workflows.totalCount > 0:
@@ -43,10 +69,10 @@ for repo in repos:
             )
 
 print()
-input("Press any key to delete the (red-colored) workflow runs...")
+input("Press [Enter] to delete the (red-colored) workflow runs...")
 print()
 
-for run in target_runs:  # deletes the workflow runs of deleted workflows
+for run in target_runs:
     print(
         f"Deleting: {run.head_repository.name} // {run.id} // {run.head_commit.message} ({run.run_number})"
     )
@@ -54,6 +80,6 @@ for run in target_runs:  # deletes the workflow runs of deleted workflows
         f"https://api.github.com/repos/{user.login}/{run.head_repository.name}/actions/runs/{run.id}",
         headers={
             "Accept": "application/vnd.github+json",
-            "Authorization": f"token {ACCESS_TOKEN}",
+            "Authorization": f"token {access_token}",
         },
     )
