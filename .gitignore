@@ -8,6 +8,9 @@
 # output files
 __pycache__/
 
+# user-specific files
+.access_token
+
 # miscellaneous files
 .DS_Store
 Desktop.ini
