@@ -6,9 +6,8 @@ from typing import Dict, List
 from art import text2art
 from colorama import Fore, just_fix_windows_console
 from github import Auth, Github
-from github.Repository import Repository
 from github.WorkflowRun import WorkflowRun
-from utils import clear_previous_lines, color_combo_repo
+from utils import clear_previous_lines
 
 ACCESS_TOKEN_FILE = Path(".accesstoken")
 
@@ -54,7 +53,7 @@ def main():
     if runs:
         input(f"Press {Fore.GREEN}[Enter]{Fore.RESET} to delete the old workflow runs...")
         print()
-        delete(runs)
+        delete(runs, dry_run=args_dry_run)
         print()
     input(f"Press {Fore.GREEN}[Enter]{Fore.RESET} to exit...")
     quit()
@@ -62,49 +61,61 @@ def main():
 
 def analyze(github: Github, mine_only: bool = False):
     print("Analyzing your repositories...")
+
     user = github.get_user()
     repos = user.get_repos()
-    target_runs: Dict[Repository, List[WorkflowRun]] = {}
+    target_runs: Dict[str, List[WorkflowRun]] = {}
     for repo in repos:
+        # Skip archived repositories
+        if repo.archived:
+            continue
+        # Skip repositories that are not owned by the user
         if mine_only and not repo.owner.login == user.login:
             continue
+
         clear_previous_lines()
-        print(f"Analyzing: {color_combo_repo(repo.owner.login, repo.name)}")
+        print(f"Analyzing: {repo.full_name}")
+
         runs = repo.get_workflow_runs()
+
+        # Skip repositories with no workflow runs
         if not runs.totalCount > 0:
             continue
+
         workflows = repo.get_workflows()
         for run in runs:
             if not any(run.workflow_id == workflow.id for workflow in workflows):
-                if repo.name not in target_runs:
-                    target_runs[repo] = []
-                target_runs[repo].append(run)
-    clear_previous_lines(1)
+                if repo.full_name not in target_runs:
+                    target_runs[repo.full_name] = []  # Fix: Initialize target_runs as an empty dictionary
+                target_runs[repo.full_name].append(run)
+
+    clear_previous_lines()
     print("Analysis complete! ", end="")
+
     if not target_runs:
         print("No old workflow runs found!")
-        return {}
+        return target_runs
     print("Here are the repositories with old workflows runs to delete:")
     for repo, runs in target_runs.items():
         print(
-            f"- {color_combo_repo(repo.owner.login, repo.name)}: {Fore.RED}{len(runs)}{Fore.RESET} runs to delete!"
+            f"- {repo}: {len(runs)} runs to delete!"
         )
     return target_runs
 
 
-def delete(runs: Dict[Repository, List[WorkflowRun]], dry_run: bool = False):
+def delete(target_runs: Dict[str, List[WorkflowRun]], dry_run: bool = False):
     print("Deleting...")
-    for repo, runs in runs.items():
-        deleted_count = 0
+    for repo, runs in target_runs.items():
+        deleted_count = 1
         for run in runs:
             clear_previous_lines()
             if dry_run:
-                # run.delete() # TODO: uncomment this line
-                pass
-            else:
                 time.sleep(1)
+            else:
+                run.delete()
+                pass
             print(
-                f"Deleted {Fore.RED}{deleted_count}{Fore.RESET} runs from {color_combo_repo(repo.owner.login, repo.name)}..."
+                f"Deleted {Fore.RED}{deleted_count}{Fore.RESET} runs from {repo}..."
             )
             deleted_count += 1
     clear_previous_lines()
