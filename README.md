@@ -1,6 +1,6 @@
 # Workflow Cleaner
 
-A simple script for cleaning old workflow runs in GitHub!
+A simple tool for cleaning old workflow runs!
 
 ## Usage
 
@@ -9,6 +9,11 @@ To get started, run `start.bat`. No further action is required, but make sure yo
 ### Prerequisites
 
 - [Python](https://python.org) 3.10+
+
+### Flags
+
+- `-m`/`--mine-only` - Only analyze repository under your account.
+- `-d`/`--dry-run` - For testing purposes only, it does not delete workflow runs.
 
 ## License
 
