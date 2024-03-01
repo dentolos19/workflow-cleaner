@@ -9,7 +9,7 @@
 __pycache__/
 
 # user-specific files
-.access_token
+.accesstoken
 
 # miscellaneous files
 .DS_Store
