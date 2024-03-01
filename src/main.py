@@ -14,18 +14,31 @@ ACCESS_TOKEN_FILE = Path(".accesstoken")
 
 def main():
     parser = ArgumentParser()
+    parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-m", "--mine-only", action="store_true")
     parser.add_argument("-d", "--dry-run", action="store_true")
     args = parser.parse_args()
+    args_verbose = args.verbose
     args_mine_only = args.mine_only
     args_dry_run = args.dry_run
 
     just_fix_windows_console()
     print(text2art("Workflow Cleaner", font="small"))
-    print("Your current options:")
-    print("- Mine Only:", f"{Fore.GREEN}On{Fore.RESET}" if args_mine_only else f"{Fore.RED}No{Fore.RESET}")
-    print("- Dry Run:", f"{Fore.GREEN}On{Fore.RESET}" if args_dry_run else f"{Fore.RED}No{Fore.RESET}")
-    print()
+    if args_verbose:
+        print("Your current options:")
+        print(
+            "- Mine Only:",
+            f"{Fore.GREEN}On{Fore.RESET}"
+            if args_mine_only
+            else f"{Fore.RED}No{Fore.RESET}",
+        )
+        print(
+            "- Dry Run:",
+            f"{Fore.GREEN}On{Fore.RESET}"
+            if args_dry_run
+            else f"{Fore.RED}No{Fore.RESET}",
+        )
+        print()
 
     access_token = get_access_token()
 
@@ -37,7 +50,7 @@ def main():
             f"the file {Fore.YELLOW}{ACCESS_TOKEN_FILE}{Fore.RESET} and run this program again."
         )
         print()
-        input(f"Press {Fore.GREEN}[Enter]{Fore.RESET} to continue...")
+        input(f"Press {Fore.CYAN}[Enter]{Fore.RESET} to continue...")
     else:
         print("Make sure your access token has access to all the")
         print("repositories with read-write access to actions.")
@@ -51,11 +64,13 @@ def main():
     runs = analyze(github, mine_only=args_mine_only)
     print()
     if runs:
-        input(f"Press {Fore.GREEN}[Enter]{Fore.RESET} to delete the old workflow runs...")
+        input(
+            f"Press {Fore.CYAN}[Enter]{Fore.RESET} to delete the old workflow runs..."
+        )
         print()
         delete(runs, dry_run=args_dry_run)
         print()
-    input(f"Press {Fore.GREEN}[Enter]{Fore.RESET} to exit...")
+    input(f"Press {Fore.CYAN}[Enter]{Fore.RESET} to exit...")
     quit()
 
 
@@ -86,7 +101,7 @@ def analyze(github: Github, mine_only: bool = False):
         for run in runs:
             if not any(run.workflow_id == workflow.id for workflow in workflows):
                 if repo.full_name not in target_runs:
-                    target_runs[repo.full_name] = []  # Fix: Initialize target_runs as an empty dictionary
+                    target_runs[repo.full_name] = []
                 target_runs[repo.full_name].append(run)
 
     clear_previous_lines()
@@ -97,9 +112,7 @@ def analyze(github: Github, mine_only: bool = False):
         return target_runs
     print("Here are the repositories with old workflows runs to delete:")
     for repo, runs in target_runs.items():
-        print(
-            f"- {repo}: {len(runs)} runs to delete!"
-        )
+        print(f"- {repo}: {len(runs)} runs to delete!")
     return target_runs
 
 
@@ -114,9 +127,7 @@ def delete(target_runs: Dict[str, List[WorkflowRun]], dry_run: bool = False):
             else:
                 run.delete()
                 pass
-            print(
-                f"Deleted {Fore.RED}{deleted_count}{Fore.RESET} runs from {repo}..."
-            )
+            print(f"Deleted {Fore.RED}{deleted_count}{Fore.RESET} runs from {repo}...")
             deleted_count += 1
     clear_previous_lines()
     print("Deleted all old workflow runs!")
