@@ -12,6 +12,7 @@ To get started, run `start.bat`. No further action is required, but make sure yo
 
 ### Flags
 
+- `-v`/`--verbose` - Show your configured options.
 - `-m`/`--mine-only` - Only analyze repository under your account.
 - `-d`/`--dry-run` - For testing purposes only, it does not delete workflow runs.
 

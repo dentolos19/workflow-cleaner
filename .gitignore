@@ -1,17 +1,17 @@
-# ide files
-.vs/
-.idea/
+# IDE configurations
+.vs
+.idea
 
-# environment files
-.venv/
+# Environment files
+.venv
 
-# output files
-__pycache__/
+# Cache files
+__pycache__
 
-# user-specific files
+# User-specific files
 .accesstoken
 
-# miscellaneous files
+# Miscellaneous files
 .DS_Store
 Desktop.ini
 Thumbs.db

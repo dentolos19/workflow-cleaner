@@ -12,16 +12,20 @@ from utils import clear_previous_lines
 ACCESS_TOKEN_FILE = Path(".accesstoken")
 
 
-def main():
+def start():
     parser = ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-m", "--mine-only", action="store_true")
     parser.add_argument("-d", "--dry-run", action="store_true")
     args = parser.parse_args()
-    args_verbose = args.verbose
-    args_mine_only = args.mine_only
-    args_dry_run = args.dry_run
+    main(
+        args_verbose=args.verbose,
+        args_mine_only=args.mine_only,
+        args_dry_run=args.dry_run,
+    )
 
+
+def main(args_verbose: bool, args_mine_only: bool, args_dry_run: bool):
     just_fix_windows_console()
     print(text2art("Workflow Cleaner", font="small"))
     if args_verbose:
@@ -41,7 +45,6 @@ def main():
         print()
 
     access_token = get_access_token()
-
     if access_token:
         print("Your access token is already saved!")
         print()
@@ -63,6 +66,7 @@ def main():
     print()
     runs = analyze(github, mine_only=args_mine_only)
     print()
+
     if runs:
         input(
             f"Press {Fore.CYAN}[Enter]{Fore.RESET} to delete the old workflow runs..."
@@ -70,6 +74,7 @@ def main():
         print()
         delete(runs, dry_run=args_dry_run)
         print()
+
     input(f"Press {Fore.CYAN}[Enter]{Fore.RESET} to exit...")
     quit()
 
@@ -144,4 +149,4 @@ def set_access_token(access_token: str):
 
 
 if __name__ == "__main__":
-    main()
+    start()
