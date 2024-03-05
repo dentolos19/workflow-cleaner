@@ -1,4 +1,7 @@
-# Workflow Cleaner
+<h1>
+    <img src="public/icon.png" alt="Icon" height="30">
+    <span>Workflow Cleaner</span>
+</h1>
 
 A simple tool for cleaning old workflow runs on GitHub Actions!
 
@@ -15,6 +18,10 @@ To get started, run `start.bat`. No further action is required, but make sure yo
 - `-v`/`--verbose` - Show your configured options.
 - `-m`/`--mine-only` - Only analyze repository under your account.
 - `-d`/`--dry-run` - For testing purposes only, it does not delete workflow runs.
+
+## 💖 Credits
+
+- Icon by [Roundicon Premium](https://flaticon.com/free-icon/paper_14040159)
 
 ## 📜 License
 
