@@ -1,12 +1,12 @@
 # IDE configurations
-.vs
-.idea
+.vs/
+.idea/
 
 # Environment files
-.venv
+.venv/
 
 # Cache files
-__pycache__
+__pycache__/
 
 # User-specific files
 .accesstoken
