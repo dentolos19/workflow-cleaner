@@ -1,3 +1,3 @@
 @echo off
 cd /d %~dp0
-call start.bat -d %*
+call start.bat -t %*

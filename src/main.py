@@ -12,37 +12,20 @@ from utils import clear_previous_lines
 ACCESS_TOKEN_FILE = Path(".accesstoken")
 
 
-def start():
+def init():
     parser = ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("-m", "--mine-only", action="store_true")
-    parser.add_argument("-d", "--dry-run", action="store_true")
+    parser.add_argument("-p", "--personal", action="store_true")
+    parser.add_argument("-t", "--test", action="store_true")
     args = parser.parse_args()
     main(
-        args_verbose=args.verbose,
-        args_mine_only=args.mine_only,
-        args_dry_run=args.dry_run,
+        personal=args.personal,
+        test=args.test,
     )
 
 
-def main(args_verbose: bool, args_mine_only: bool, args_dry_run: bool):
+def main(personal: bool, test: bool):
     just_fix_windows_console()
     print(text2art("Workflow Cleaner", font="small"))
-    if args_verbose:
-        print("Your current options:")
-        print(
-            "- Mine Only:",
-            f"{Fore.GREEN}On{Fore.RESET}"
-            if args_mine_only
-            else f"{Fore.RED}No{Fore.RESET}",
-        )
-        print(
-            "- Dry Run:",
-            f"{Fore.GREEN}On{Fore.RESET}"
-            if args_dry_run
-            else f"{Fore.RED}No{Fore.RESET}",
-        )
-        print()
 
     access_token = get_access_token()
     if access_token:
@@ -64,7 +47,7 @@ def main(args_verbose: bool, args_mine_only: bool, args_dry_run: bool):
     github = Github(auth=Auth.Token(access_token))
 
     print()
-    runs = analyze(github, mine_only=args_mine_only)
+    runs = analyze(github, personal=personal)
     print()
 
     if runs:
@@ -72,14 +55,14 @@ def main(args_verbose: bool, args_mine_only: bool, args_dry_run: bool):
             f"Press {Fore.CYAN}[Enter]{Fore.RESET} to delete the old workflow runs..."
         )
         print()
-        delete(runs, dry_run=args_dry_run)
+        delete(runs, test=test)
         print()
 
     input(f"Press {Fore.CYAN}[Enter]{Fore.RESET} to exit...")
     quit()
 
 
-def analyze(github: Github, mine_only: bool = False):
+def analyze(github: Github, personal: bool = False):
     print("Analyzing your repositories...")
 
     user = github.get_user()
@@ -90,7 +73,7 @@ def analyze(github: Github, mine_only: bool = False):
         if repo.archived:
             continue
         # Skip repositories that are not owned by the user
-        if mine_only and not repo.owner.login == user.login:
+        if personal and not repo.owner.login == user.login:
             continue
 
         clear_previous_lines()
@@ -121,13 +104,13 @@ def analyze(github: Github, mine_only: bool = False):
     return target_runs
 
 
-def delete(target_runs: Dict[str, List[WorkflowRun]], dry_run: bool = False):
+def delete(target_runs: Dict[str, List[WorkflowRun]], test: bool = False):
     print("Deleting...")
     for repo, runs in target_runs.items():
         deleted_count = 1
         for run in runs:
             clear_previous_lines()
-            if dry_run:
+            if test:
                 time.sleep(1)
             else:
                 run.delete()
@@ -149,4 +132,4 @@ def set_access_token(access_token: str):
 
 
 if __name__ == "__main__":
-    start()
+    init()
