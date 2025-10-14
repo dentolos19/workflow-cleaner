@@ -1,11 +1,8 @@
-<h1>
-  <img src="public/icon.png" alt="Icon" height="30" />
-  <span>Workflow Cleaner</span>
-</h1>
+# Workflow Cleaner
 
 A simple tool for cleaning old workflow runs on GitHub Actions!
 
-## ⚒️ Usage
+## Usage
 
 ### Prerequisites
 
@@ -16,10 +13,10 @@ A simple tool for cleaning old workflow runs on GitHub Actions!
 - `-p`/`--personal` - Only analyze repository under your account.
 - `-t`/`--test` - For testing purposes only, it does not delete workflow runs.
 
-## 💖 Credits
+## Credits
 
 - Icon by [Roundicon Premium](https://flaticon.com/free-icon/paper_14040159)
 
-## 📜 License
+## License
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.

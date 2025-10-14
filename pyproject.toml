@@ -1,0 +1,6 @@
+[project]
+name = "workflow-cleaner"
+version = "1.0.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["art>=6.5", "colorama>=0.4.6", "pygithub>=2.8.1"]
