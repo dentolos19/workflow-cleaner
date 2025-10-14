@@ -86,29 +86,22 @@ def analyze(github: Github, personal: bool = False):
 
         # Get all workflow files in the repository
         workflows = repo.get_workflows()
+        workflow_ids = []
 
-        # Build a map of workflow IDs to their file paths
-        workflow_paths = {}
+        # Build a list of valid workflows
         for workflow in workflows:
-            workflow_paths[workflow.id] = workflow.path
+            try:
+                # Only add to the list if the file exists
+                repo.get_contents(workflow.path)
+                workflow_ids.append(workflow.id)
+            except Exception as e:
+                # Skip workflows whose files don't exist
+                if hasattr(e, "status") and e.status == 404:
+                    continue
 
-        # Check each workflow run to see if its workflow file still exists
+        # Delete runs whose workflow files no longer exist
         for run in workflow_runs:
-            should_delete = False
-
-            # Check if workflow ID is not in the list of active workflows
-            if run.workflow_id not in workflow_paths:
-                should_delete = True
-            else:
-                # Even if the workflow ID exists, check if the actual file exists
-                try:
-                    repo.get_contents(run.path)
-                except Exception as e:
-                    # Only delete if we get a 404 (file not found), not 403 (forbidden)
-                    if hasattr(e, "status") and e.status == 404:
-                        should_delete = True
-
-            if should_delete:
+            if run.workflow_id not in workflow_ids:
                 if repo.full_name not in target_runs:
                     target_runs[repo.full_name] = []
                 target_runs[repo.full_name].append(run)
