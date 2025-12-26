@@ -2,15 +2,16 @@
 .vs/
 .idea/
 
-# Environment files
+# Project files
 .venv/
-
-# Output files
+__pycache__/
 build/
 dist/
-__pycache__/
+*.spec
 
-# User-specific files
+# User files
+.env*
+!.env*.template
 .accesstoken
 
 # Miscellaneous files
